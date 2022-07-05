@@ -4,7 +4,7 @@ from pprint import pprint
 def get_token(name_file):
     """ Получаю TOKEN из txt файла """
     with open(name_file, "r", encoding="utf-8") as f:
-        token = f.read()
+        token = f.readline()
         return token
 
 class Vkontacte:
@@ -13,21 +13,31 @@ class Vkontacte:
         self.V = "5.131"
         self.URL = "https://api.vk.com/method/"
 
-    def photo(self, id: str): # Взял этот метод просто для проверки работоспособности запросов от имни приложения
-        """Все фотографии с профиля и информация о них"""
+    def find(self):
         params = {
-            "owner_id": id,
-            "extended": '1',
-            "album_id":'profile',
+            "count": '1000',
+            "sort": "0",
+            "user_id": "173442120",  # это мой ID, сюда надо будет вставлять ID user'а который ищет
+            "offset": "0",
+            "fields": "bdate,city,relation,can_write_private_message,can_see_all_posts",
             "access_token": self.token,
-            "v": self.V
+            "v": self.V,
+            "has_photo": "1",
+            "hometown": "тюмень",   # строковое значение, регистр не важен
+            "sex": "2",             # 1-жен, 0-муж
+            "status": "1",          # 1-8 см. справку
+            "age_from": "18",       # от
+            "age_to": "23",         # до old
             }
-        url = f"{self.URL}photos.get"
+        url = f"{self.URL}users.search"
         res = requests.get(url, params=params)
         return res.json()
 
+
 if __name__ == "__main__":
     TOKEN = get_token("token_app.txt")
+
     vk = Vkontacte(TOKEN)
-    durov = vk.photo(1) # ID=1 это павел дуров
-    pprint(durov)
+    w = vk.find()
+    r = w["response"]["items"]
+    pprint(r)
