@@ -1,11 +1,13 @@
 import requests
 from pprint import pprint
 
+
 def get_token(name_file):
     """ Получаю TOKEN из txt файла """
     with open(name_file, "r", encoding="utf-8") as f:
         token = f.readline()
         return token
+
 
 class Vkontacte:
     def __init__(self, token: str):

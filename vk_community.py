@@ -2,15 +2,17 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 
 
-def write_msg(user_id, message):
+def write_msg(user_id, mes):
     """ Для отправки сообщения"""
-    vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': 0})
+    vk.method('messages.send', {'user_id': user_id, 'message': mes, 'random_id': 0})
+
 
 def get_token(name_file):
     """ Получаю TOKEN из txt файла """
     with open(name_file, "r", encoding="utf-8") as f:
         token = f.read()
         return token
+
 
 # API-ключ созданный ранее
 TOKEN = get_token("token_community.txt")
