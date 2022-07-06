@@ -3,14 +3,7 @@ from vk_api.longpoll import VkLongPoll
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
 
-def write_msg(vk: vk_api.vk_api.VkApi, user_id: int, message: str):
-    """ Отправка сообщения, потом переделаю"""
-    """ Для отправки сообщения"""
-    vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': 0})
-
-
 def get_token(name_file):
-    """ Получения токена из файла"""
     """ Получаю TOKEN из txt файла """
     with open(name_file, "r", encoding="utf-8") as f:
         token = f.read()
