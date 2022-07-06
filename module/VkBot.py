@@ -4,6 +4,7 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
 
 def get_token(name_file):
+    """ Получения токена из файла"""
     """ Получаю TOKEN из txt файла """
     with open(name_file, "r", encoding="utf-8") as f:
         token = f.read()
@@ -17,7 +18,7 @@ class Keyboard:
         self.kb = self._kb_obj()
 
     def _kb_obj(self):
-        """ Настройка отображения клавиатуры"""
+        """ Получаем объект клавиатуры с настройками"""
         return VkKeyboard(one_time=self.one_time, inline=self.inline)
 
     def pattern_kb(self, *args):
@@ -51,6 +52,7 @@ class VkBot:
 
 
 class VkBoard(VkBot, Keyboard):
+    """ Класс объедняющий VkBot, Keyboard c реализацией доп методов"""
     def __init__(self, token, one_time: bool = False, inline: bool = False):
         super().__init__(token)
         self.one_time = one_time
@@ -60,16 +62,17 @@ class VkBoard(VkBot, Keyboard):
         self.method = self._method()
 
     def vk_send_board(self, user_id):
+        """ Отправка клавиатуры пользователю"""
         self.method.messages.send(random_id=0, keyboard=self.kb.get_keyboard(), user_id=user_id, peer_id=user_id, message=".")
 
-    def check_board(self, old_kb, user_id):
-        new_kb = self.kb.get_keyboard()
-        if self.kb.get_keyboard() != old_kb:
+    def check_board(self, keyboard, user_id):
+        """ Отправка клавиатуры пользователю с проверкой на нет ли у него этой клавы"""
+        if self.kb.get_keyboard() != keyboard:
             self.vk_send_board(user_id)
-            old_kb = new_kb
-        return old_kb
+        return keyboard
 
     def send_msg(self, messenge, user_id):
+        """ Отправка сообщений пользователю"""
         self.method.messages.send(
                 random_id=0,
                 user_id=user_id,
