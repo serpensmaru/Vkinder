@@ -1,35 +1,35 @@
-import vk_api
-from vk_api.longpoll import VkLongPoll, VkEventType
-
-
-def write_msg(user_id, message):
-    """ Для отправки сообщения"""
-    vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': 0})
-
-def get_token(name_file):
-    """ Получаю TOKEN из txt файла """
-    with open(name_file, "r", encoding="utf-8") as f:
-        token = f.read()
-        return token
+from vk_api.longpoll import VkEventType
+from module.VkBot import VkBoard, get_token
 
 # API-ключ созданный ранее
 TOKEN = get_token("token_community.txt")
-
-# Авторизуемся как сообщество VK
-vk = vk_api.VkApi(token=TOKEN)
-
-# Работа с сообщениями
-longpoll = VkLongPoll(vk)
-
+# Инициация класса бота и клавиатуры
+session = VkBoard(TOKEN)
+# vk для обращений к методам API, longpoll для контроля событий
+vk = session.method
+longpoll = session.evention()
+# Инициация класса клавиатур
+kb = session.kb
+# Создаем кнопки 5 штук и 1 строку
+list_butt = ("Помощь", "Поиск", "Избранное", 0, "Сохранить", "Свайп")
+keyboard = session.pattern_kb(*list_butt)
 # Цикл для получения событий(сообщений) адресованных боту (в сообщество)
 for event in longpoll.listen():
-    # Если пришло новое сообщение. определяем тип события == сообщение
     if event.type == VkEventType.MESSAGE_NEW:
         # Если оно имеет метку для меня (то есть бота)
         if event.to_me:
-            message = event.text.lower()  # получаем текст сообещния и приводим к нижнему регистру
-            id_user = event.user_id  # получаем user_id, того кто пишет боту
-            print(id_user)
-            print(message)
-            write_msg(id_user, "Привет я бот для знакомств")
-            write_msg(id_user, "Скоро тут будет инструкция как мной пользоваться")
+            # получаем user_id, того кто пишет боту
+            id_user = event.user_id
+            # Проверяем клавиатуру user'a, если уже отправлена, то не отправляем
+            old_kb = session.check_board(keyboard, user_id=id_user)
+            print(event.text)
+            if event.text == "Помощь":
+                session.send_msg("Поведение помощи еще не прописанно", id_user)
+            elif event.text == "Поиск":
+                session.send_msg("Поведение поиска еще не прописанно", id_user)
+            elif event.text == "Избранное":
+                session.send_msg("Поведение избранного еще не прописанно", id_user)
+            elif event.text == "Сохранить":
+                session.send_msg("Поведение сохранить еще не прописанно", id_user)
+            elif event.text == "Свайп":
+                session.send_msg("Поведение свайпа еще не прописанно", id_user)
