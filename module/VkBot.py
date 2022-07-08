@@ -22,7 +22,7 @@ class Keyboard:
         return VkKeyboard(one_time=self.one_time, inline=self.inline)
 
     def pattern_kb(self, *args):
-        """ Создание кнопок из списка, если попадает на False, то создаем новую строку кнопок"""
+        """ Создание кнопок из списка/кортежа, если попадает на False/0, то создаем новую строку кнопок"""
         for one in args:
             if one == 0:
                 self.kb.add_line()
@@ -69,7 +69,7 @@ class VkBoard(VkBot, Keyboard):
         """ Отправка клавиатуры пользователю с проверкой на нет ли у него этой клавы"""
         if self.kb.get_keyboard() != keyboard:
             self.vk_send_board(user_id)
-        return keyboard
+        return keyboardе
 
     def send_msg(self, messenge, user_id):
         """ Отправка сообщений пользователю"""

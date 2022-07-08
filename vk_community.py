@@ -11,7 +11,7 @@ longpoll = session.evention()
 # Инициация класса клавиатур
 kb = session.kb
 # Создаем кнопки 5 штук и 1 строку
-list_butt = ["Помощь", "Поиск", "Избранное", False, "Сохранить", "Свайп"]
+list_butt = ("Помощь", "Поиск", "Избранное", 0, "Сохранить", "Свайп")
 keyboard = session.pattern_kb(*list_butt)
 # Цикл для получения событий(сообщений) адресованных боту (в сообщество)
 for event in longpoll.listen():
