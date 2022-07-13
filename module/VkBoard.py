@@ -1,6 +1,7 @@
-import vk_api
+from vk_api import VkApi
 from vk_api.longpoll import VkLongPoll
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from vk_api.longpoll import VkEventType
 
 
 def get_token(name_file):
@@ -30,16 +31,15 @@ class Keyboard:
                 self.kb.add_button(label=one, color=VkKeyboardColor.NEGATIVE)
         return self.kb.get_keyboard()
 
-
 class VkBot:
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, tokenCommunity):
+        self.token = tokenCommunity
         self.session = self._session()
         self.method = self._method()
 
     def _session(self):
         """ Базовый класс"""
-        ses = vk_api.VkApi(token=self.token)
+        ses = VkApi(token=self.token)
         return ses
 
     def _method(self):
@@ -50,11 +50,16 @@ class VkBot:
         """ Объект слежения за событиями"""
         return VkLongPoll(self.session)
 
+    def message_type(self):
+        """ Тип сообытия сообщения"""
+        return VkEventType.MESSAGE_NEW
+
+
 
 class VkBoard(VkBot, Keyboard):
     """ Класс объедняющий VkBot, Keyboard c реализацией доп методов"""
-    def __init__(self, token, one_time: bool = False, inline: bool = False):
-        super().__init__(token)
+    def __init__(self, tokenCommunity, one_time: bool = False, inline: bool = False):
+        super().__init__(tokenCommunity)
         self.one_time = one_time
         self.inline = inline
         self.kb = self._kb_obj()
@@ -69,7 +74,7 @@ class VkBoard(VkBot, Keyboard):
         """ Отправка клавиатуры пользователю с проверкой на нет ли у него этой клавы"""
         if self.kb.get_keyboard() != keyboard:
             self.vk_send_board(user_id)
-        return keyboardе
+        return keyboard
 
     def send_msg(self, messenge, user_id):
         """ Отправка сообщений пользователю"""
