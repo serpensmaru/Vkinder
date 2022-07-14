@@ -16,9 +16,9 @@ class Keyboard:
     def __init__(self, one_time: bool = False, inline: bool = False):
         self.one_time = one_time
         self.inline = inline
-        self.kb = self._kb_obj()
+        self.kb = self.kb_obj()
 
-    def _kb_obj(self):
+    def kb_obj(self):
         """ Получаем объект клавиатуры с настройками"""
         return VkKeyboard(one_time=self.one_time, inline=self.inline)
 
@@ -30,6 +30,7 @@ class Keyboard:
             else:
                 self.kb.add_button(label=one, color=VkKeyboardColor.NEGATIVE)
         return self.kb.get_keyboard()
+
 
 class VkBot:
     def __init__(self, tokenCommunity):
@@ -50,10 +51,10 @@ class VkBot:
         """ Объект слежения за событиями"""
         return VkLongPoll(self.session)
 
-    def message_type(self):
+    @staticmethod
+    def message_type():
         """ Тип сообытия сообщения"""
         return VkEventType.MESSAGE_NEW
-
 
 
 class VkBoard(VkBot, Keyboard):
@@ -62,13 +63,13 @@ class VkBoard(VkBot, Keyboard):
         super().__init__(tokenCommunity)
         self.one_time = one_time
         self.inline = inline
-        self.kb = self._kb_obj()
+        self.kb = self.kb_obj()
         self.session = self._session()
         self.method = self._method()
 
-    def vk_send_board(self, user_id):
+    def vk_send_board(self, user_id, msg="."):
         """ Отправка клавиатуры пользователю"""
-        self.method.messages.send(random_id=0, keyboard=self.kb.get_keyboard(), user_id=user_id, peer_id=user_id, message=".")
+        self.method.messages.send(random_id=0, keyboard=self.kb.get_keyboard(), user_id=user_id, peer_id=user_id, message=msg)
 
     def check_board(self, keyboard, user_id):
         """ Отправка клавиатуры пользователю с проверкой на нет ли у него этой клавы"""
@@ -83,4 +84,14 @@ class VkBoard(VkBot, Keyboard):
                 user_id=user_id,
                 peer_id=user_id,
                 message=messenge
+            )
+
+    def send_msg_photo(self, messenge, user_id, photos):
+        """ Отправка сообщений с фото пользователю"""
+        self.method.messages.send(
+                random_id=0,
+                user_id=user_id,
+                peer_id=user_id,
+                message=messenge,
+                attachment=photos
             )

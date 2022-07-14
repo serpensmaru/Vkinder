@@ -1,5 +1,6 @@
 from module.VkOperator import VkOperator
-from module.VkBoard import get_token
+from module.VkBoard import get_token, VkBoard
+from pprint import pprint
 
 
 if __name__ == "__main__":
@@ -21,3 +22,13 @@ if __name__ == "__main__":
         old_min=age_from, old_max=age_to)
     print(len(a))
     print(a)
+    # g = session.get_photo_id(173442120)
+    # pprint(g)
+
+    q = session.get_max_photos_id(173442120)
+    print(q)
+    pg = f"photo173442120_{q[0]}"
+    print(pg)
+    # token = get_token("token_pers.txt")
+    # vk = VkBoard(token)
+    vk.send_msg_photo("qwe", 173442120, photo173442120_456240882)
