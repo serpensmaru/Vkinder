@@ -1,5 +1,6 @@
 from vk_api import VkApi
 from itertools import cycle
+from re import search
 
 
 class VkOperator:
@@ -102,3 +103,54 @@ class VkOperator:
         url = "{}{}".format("https://vk.com/id", user_id)
         masg_send = f"{name}\n{url}"
         return masg_send, photos
+
+    @staticmethod
+    def if_attribute_none(attr, val: str):
+        if attr is None:
+            return val
+        else:
+            return attr
+
+    @staticmethod
+    def if_sex(event):
+        if event == "мужской":
+            return "2"
+        elif event == "женский":
+            return "1"
+        elif event == "любой пол":
+            return "0"
+
+    @staticmethod
+    def sext_text_from_int(int_sex):
+        if int_sex == "2":
+            return "мужской"
+        elif int_sex == "1":
+            return "женский"
+        elif int_sex == "0":
+            return "любой пол"
+        elif int_sex == "Не выбрано":
+            return int_sex
+
+    @staticmethod
+    def select_old(old_text):
+        reg = r"(\d+)(\D*)(\d+)"
+        res = search(reg, old_text)
+        old_from = int(res.group(1))
+        old_to = int(res.group(3))
+        age_from = min(old_from, old_to)
+        age_to = max(old_to, old_from)
+        return age_from, age_to
+
+    @staticmethod
+    def select_town(old_text):
+        reg = r"(\s+|-)(\w*)"
+        res = search(reg, old_text)
+        town = res.group(2)
+        return town
+
+    @staticmethod
+    def selext_status(status):
+        reg = r"(\s+)(\d*)"
+        res = search(reg, status)
+        int_status = int(res.group(2))
+        return int_status
