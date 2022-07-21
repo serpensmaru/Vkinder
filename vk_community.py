@@ -48,7 +48,6 @@ for event in longpoll.listen():
                 session.send_msg("Введите название города\nОбразец:\nгород Тюмень", id_user)
             elif "город" in event.text.lower():
                 hometown = srch.select_town(event.text.lower()).capitalize()
-                print(hometown)
                 session.send_msg("Город успешно выбран, введите статус:\n1-не женат(не замужем)\n2-встречаются\n3-помолвен(а)\n4-женат(замужем)\n5-все сложно\n6-в активном поиске\n7-влюблен(а)\n8-в граждансокм браке\nОбразец:\nстатус цифра статуса", id_user)
             elif "статус" in event.text.lower():
                 status = srch.selext_status(event.text.lower())
@@ -79,4 +78,4 @@ for event in longpoll.listen():
                     # Отправялем пользователю имя и фотки
                     session.send_msg_photo(msg, id_user, photos)
                 else:
-                    session.send_msg(f"Поведение свайпа еще не прописанно", id_user)
+                    session.send_msg(f"Сначала нажмите поиск и следуйте инструкции", id_user)
