@@ -87,6 +87,10 @@ class VkOperator:
             yield next(i)
 
     @staticmethod
+    def immotrtal_favour(iter_obj):
+        return cycle(iter_obj)
+
+    @staticmethod
     def atachment_photo(id_owner, list_id):
         """ Формируем строку для attachment в massages.send в виде <type><owner_id>_<media_id>"""
         list_ph = []
