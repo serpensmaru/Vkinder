@@ -4,3 +4,4 @@ token_app.txt
 code
 __pycache__
 token_pers.txt
+/module/creation_db.py

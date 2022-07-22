@@ -1,9 +1,10 @@
 from module.VkBoard import VkBoard, get_token
 from module.VkOperator import VkOperator
-from module.PostgressVK import engine_driv,get_favour_id, Base_model,add_swipe, add_favour, bool_swipe_id, Favour, User, Swipe, inserting, if_not_add_user_id
+from module.PostgressVK import engine_driv, get_favour_id, clear_sewipe, del_favour, Base_model, add_swipe, add_favour, bool_swipe_id, User, Swipe, if_not_add_user_id
 # Создание базы данных
 engine = engine_driv(user_db_name="postgres", password="123456", db_name="vkinder", log=False)
-Base_model.metadata.create_all(engine)  #  Создание таблиц, если их нет
+#  Создание таблиц, если их нет
+Base_model.metadata.create_all(engine)
 # API-ключ созданный ранее
 TOKEN_commun = get_token("token_community.txt")
 # Инициация класса бота и клавиатуры
@@ -27,6 +28,7 @@ age_to = None
 status = None
 hometown = None
 iter_id_favour = None
+id_favour = None
 for event in longpoll.listen():
     if event.type == type_message:
         # Если оно имеет метку для меня (то есть бота)
@@ -35,7 +37,8 @@ for event in longpoll.listen():
             id_user = event.user_id
             # Проверяем клавиатуру user'a, если уже отправлена, то не отправляем
             session.vk_send_board(id_user)
-            if_not_add_user_id(id_user, engine, User) # Добавляет пользователя в БД, если его там нет
+            # Добавляет пользователя в БД, если его там нет
+            if_not_add_user_id(id_user, engine, User)
             if event.text == "Помощь":
                 text_find = "*\tПоиск - нажмите поиск и введите предложенные критерии поиска (пол, возраст, город, статус)\n"
                 text_save = "*\tСохранить - после поиска вы можете сохранить понравившегося человека в избранное\n"
@@ -44,7 +47,7 @@ for event in longpoll.listen():
                 text_favour_s = " *\tСлед. избран. - нажмите чтобы листать избранное, нажимается после 'Избранное'\n"
                 text_swipe = "*\tСвайп - листать найденныъ людей после поиска\n"
                 text_del = "*\tDel из избран. - когда листаете избранное, можете нажать чтобы удалить текущего человека из избранного\n"
-                text_сlear = "*\tОчистить - люди которых вы свайпнули больше вам не попадуться в поиске, чтобы вернуть их в поиск нажмите очистить\n"
+                text_сlear = "*\tОчистить - люди которых вы свайпнули больше вам не попадутся в поиске, чтобы вернуть их в поиск нажмите очистить\n"
                 help_text = f"{text_find}{text_сlear}{text_save}{text_favour}{text_favour_s}{text_del}{text_criteria}{text_swipe}"
                 session.send_msg(help_text, id_user)
 
@@ -73,33 +76,6 @@ for event in longpoll.listen():
                 session.send_msg("Поск завершен, нажмите свайп", id_user)
                 x = 1
 
-            elif event.text == "Критерии":
-                sex = srch.if_attribute_none(sex, "Не выбрано")
-                sex_text = srch.sext_text_from_int(sex)
-                age_from = srch.if_attribute_none(age_from, "X")
-                age_to = srch.if_attribute_none(age_to, "X")
-                status = srch.if_attribute_none(status, "Не выбрано")
-                session.send_msg(f"Пол: {sex_text}\nВозраст от {age_from} до {age_to}\nГород: {hometown}\nСтатус: {status}", id_user)
-
-            elif event.text == "Избранное":
-                list_favout = get_favour_id(engine, id_user)
-                iter_id_favour = srch.immotrtal_favour(list_favout)
-                session.send_msg("Нажмите след. избран.", id_user)
-
-            elif event.text == "Сохранить":
-                if x == 1:
-                    add_favour(id_user, id_actual, engine)
-                    session.send_msg("Сохраненно", id_user)
-                else:
-                    session.send_msg("Начните поиск и нажмите свайп", id_user)
-
-            elif event.text == "след. избран.":
-                if iter_id_favour != None:
-                    id_favour = next(iter_id_favour)
-                    msg, photos = srch.msg_for_send_photo(id_favour)
-                    session.send_msg_photo(msg, id_user, photos)
-                else:
-                    session.send_msg("Сначала нажмите избранное", id_user)
             elif event.text == "Свайп":
                 # Проверка Х, если был произведен поиск то Х=1, елси нет то 0
                 # В идале было просто написать через искулючения, но я еще не умею этого
@@ -109,12 +85,46 @@ for event in longpoll.listen():
                     while bool_val:
                         id_actual = next(iter_id_find)
                         bool_val = bool_swipe_id(id_actual, id_user, engine, Swipe)
-                        if bool_val == False:
+                        if bool_val:
                             break
                     msg, photos = srch.msg_for_send_photo(id_actual)
                     # Отправялем пользователю имя и фотки
                     session.send_msg_photo(msg, id_user, photos)
                     add_swipe(id_user=id_user, id_swipe=id_actual, engine=engine)
-
                 else:
                     session.send_msg(f"Сначала нажмите поиск и следуйте инструкции", id_user)
+
+            elif event.text == "Очистить":
+                clear_sewipe(engine, id_user)
+
+            elif event.text == "Критерии":
+                sex = srch.if_attribute_none(sex, "Не выбрано")
+                sex_text = srch.sext_text_from_int(sex)
+                age_from = srch.if_attribute_none(age_from, "X")
+                age_to = srch.if_attribute_none(age_to, "X")
+                status = srch.if_attribute_none(status, "Не выбрано")
+                session.send_msg(f"Пол: {sex_text}\nВозраст от {age_from} до {age_to}\nГород: {hometown}\nСтатус: {status}", id_user)
+
+            elif event.text == "Сохранить":
+                if x == 1:
+                    add_favour(id_user, id_actual, engine)
+                    session.send_msg("Сохраненно", id_user)
+                else:
+                    session.send_msg("Начните поиск и нажмите свайп", id_user)
+
+            elif event.text == "Избранное":
+                list_favout = get_favour_id(engine, id_user)
+                iter_id_favour = srch.immotrtal_favour(list_favout)
+                session.send_msg("Нажмите след. избран.", id_user)
+
+            elif event.text == "Cлед. избран.":
+                if iter_id_favour != 1:
+                    id_favour = next(iter_id_favour)
+                    msg, photos = srch.msg_for_send_photo(id_favour)
+                    session.send_msg_photo(msg, id_user, photos)
+                else:
+                    session.send_msg("Сначала нажмите избранное", id_user)
+
+            elif event.text == "Del из избран.":
+                if id_favour is not None:
+                    del_favour(engine, id_user, id_favour)

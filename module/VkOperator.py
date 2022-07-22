@@ -76,7 +76,7 @@ class VkOperator:
         no_sort = self.parametrs_for_find(user_id, gender, hometown, status, old_min, old_max, sorting=1)
         sorting = self.parametrs_for_find(user_id, gender, hometown, status, old_min, old_max, sorting=0)
         summ = [*no_sort, *sorting]
-        id_set = set([x["id"] for x in summ if x["is_closed"] == False])
+        id_set = set([x["id"] for x in summ if x["is_closed"] is False])
         return id_set
 
     @staticmethod
