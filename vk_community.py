@@ -118,7 +118,7 @@ for event in longpoll.listen():
                 session.send_msg("Нажмите след. избран.", id_user)
 
             elif event.text == "Cлед. избран.":
-                if iter_id_favour != 1:
+                if iter_id_favour != None:
                     id_favour = next(iter_id_favour)
                     msg, photos = srch.msg_for_send_photo(id_favour)
                     session.send_msg_photo(msg, id_user, photos)
