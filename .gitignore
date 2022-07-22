@@ -1,5 +1,6 @@
 .idea
 token_community.txt
-token_app.txt
-code
 token_pers.txt
+__pycache__
+token_pers.txt
+/module/creation_db.py

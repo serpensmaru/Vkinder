@@ -1,6 +1,7 @@
-import vk_api
+from vk_api import VkApi
 from vk_api.longpoll import VkLongPoll
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from vk_api.longpoll import VkEventType
 
 
 def get_token(name_file):
@@ -15,9 +16,9 @@ class Keyboard:
     def __init__(self, one_time: bool = False, inline: bool = False):
         self.one_time = one_time
         self.inline = inline
-        self.kb = self._kb_obj()
+        self.kb = self.kb_obj()
 
-    def _kb_obj(self):
+    def kb_obj(self):
         """ Получаем объект клавиатуры с настройками"""
         return VkKeyboard(one_time=self.one_time, inline=self.inline)
 
@@ -32,14 +33,14 @@ class Keyboard:
 
 
 class VkBot:
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, tokenCommunity):
+        self.token = tokenCommunity
         self.session = self._session()
         self.method = self._method()
 
     def _session(self):
         """ Базовый класс"""
-        ses = vk_api.VkApi(token=self.token)
+        ses = VkApi(token=self.token)
         return ses
 
     def _method(self):
@@ -50,26 +51,31 @@ class VkBot:
         """ Объект слежения за событиями"""
         return VkLongPoll(self.session)
 
+    @staticmethod
+    def message_type():
+        """ Тип сообытия сообщения"""
+        return VkEventType.MESSAGE_NEW
+
 
 class VkBoard(VkBot, Keyboard):
     """ Класс объедняющий VkBot, Keyboard c реализацией доп методов"""
-    def __init__(self, token, one_time: bool = False, inline: bool = False):
-        super().__init__(token)
+    def __init__(self, tokenCommunity, one_time: bool = False, inline: bool = False):
+        super().__init__(tokenCommunity)
         self.one_time = one_time
         self.inline = inline
-        self.kb = self._kb_obj()
+        self.kb = self.kb_obj()
         self.session = self._session()
         self.method = self._method()
 
-    def vk_send_board(self, user_id):
+    def vk_send_board(self, user_id, msg="."):
         """ Отправка клавиатуры пользователю"""
-        self.method.messages.send(random_id=0, keyboard=self.kb.get_keyboard(), user_id=user_id, peer_id=user_id, message=".")
+        self.method.messages.send(random_id=0, keyboard=self.kb.get_keyboard(), user_id=user_id, peer_id=user_id, message=msg)
 
     def check_board(self, keyboard, user_id):
         """ Отправка клавиатуры пользователю с проверкой на нет ли у него этой клавы"""
         if self.kb.get_keyboard() != keyboard:
             self.vk_send_board(user_id)
-        return keyboardе
+        return keyboard
 
     def send_msg(self, messenge, user_id):
         """ Отправка сообщений пользователю"""
@@ -78,4 +84,14 @@ class VkBoard(VkBot, Keyboard):
                 user_id=user_id,
                 peer_id=user_id,
                 message=messenge
+            )
+
+    def send_msg_photo(self, messenge, user_id, photos):
+        """ Отправка сообщений с фото пользователю"""
+        self.method.messages.send(
+                random_id=0,
+                user_id=user_id,
+                peer_id=user_id,
+                message=messenge,
+                attachment=photos
             )
