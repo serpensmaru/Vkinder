@@ -1,5 +1,9 @@
 from module.VkBoard import VkBoard, get_token
 from module.VkOperator import VkOperator
+from module.PostgressVK import engine_driv, Base_model, Favour, Swipe, insert_user_id, inserting, if_not_add_user_id
+# Создание базы данных
+engine = engine_driv(user_db_name="postgres", password="123456", db_name="vkinder", log=False)
+Base_model.metadata.create_all(engine)  #  Создание таблиц, если их нет
 # API-ключ созданный ранее
 TOKEN_commun = get_token("token_community.txt")
 # Инициация класса бота и клавиатуры
@@ -30,6 +34,8 @@ for event in longpoll.listen():
             id_user = event.user_id
             # Проверяем клавиатуру user'a, если уже отправлена, то не отправляем
             session.vk_send_board(id_user)
+            print(id_user)
+            if_not_add_user_id(id_user, engine) # Добавляет пользователя в БД, если его там нет
             if event.text == "Помощь":
                 text_find = "*\tПоиск - нажмите поиск и введите предложенные критерии поиска (пол, возраст, город, статус)\n"
                 text_save = "*\tСохранить - после поиска вы можете сохранить понравившегося человека\n"
